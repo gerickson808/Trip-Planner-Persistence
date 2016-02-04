@@ -19,21 +19,44 @@ router.get('/',function(req, res){
 //Get one day
 router.get('/:id', function(req,res){
 	var id = req.params.id;
-	Day.findOne({_id:id}).exec()
+	Day.findOne({number:id}).exec()
 	.then(function(day){
+		console.log(day);
 		res.json(day);
 	});
 });
 
 //Create a day!
-router.post('/',function(req,res){
-	var day = new Day();
+router.post('/',function(req,res, next){
+	console.log("request:",req.body);
+	Day.create({
+		number: req.body.number,
+		hotel: null,
+		restaurants: [],
+		activities: [],
+	})
+	.then(function(day){
+		res.json(day);
+	})
+	.then(null, next);
 });
 //Destroy it
-router.delete('/:id',function(req,res){	});
+router.delete('/:id',function(req,res){	
+	// Day.findOne({_id: id})
+});
 
 //Add a hotel to a day!!!
-router.post('/:id/hotels',function(req,res){});
+router.post('/:id/hotels',function(req,res){
+	var ourhotel;
+	Hotel.find({name:req.body.name}).exec()
+	.then(function(hotel){
+		ourhotel = hotel;
+		return Day.findOne({_id:req.params.id}).exec();
+	}).then(function(day){
+		day.hotel = ourhotel._id;
+	});
+});
+
 //remove
 router.delete('/:id/hotels',function(req,res){	});
 

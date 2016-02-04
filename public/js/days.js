@@ -16,7 +16,7 @@ var daysModule = (function(){
     $removeDay = $('#day-title > button.remove');
     $dayTitle = $('#day-title > span');
     $addButton = $('#day-add');
-  })
+  });
 
   // Day class
 
@@ -34,13 +34,38 @@ var daysModule = (function(){
     var self = this;
     this.$button.on('click', function(){
       this.blur();
-      self.switchTo();
-    })
+      getDay(self)
+    });
     return this;
   };
 
+
+  function getDay(day){
+      console.log("imma day", day)
+    $.ajax({
+      method: 'GET',
+      url: '/api/days/'+day.number,
+      //data: {hotel:day.hotel, restaurants:day.restaurants, activities:day.activities},
+      success: function(response){
+        for(var key in day){
+          if(response.hasOwnProperty(key)){
+            day[key] = response[key];
+          }
+        }
+        console.log(currentDay);
+        day.switchTo.call(day)
+        .then(null,function(err){
+          console.log(err);
+        })},
+      error: function(err){
+        console.log(err);
+      }
+    });
+  }
+
   Day.prototype.drawButton = function() {
     this.$button.appendTo($dayButtons);
+    this.$button = this.$button;
     return this;
   };
 
@@ -55,9 +80,12 @@ var daysModule = (function(){
     currentDay.activities.forEach(erase);
 
     // front-end model change
+    console.log("this", this);
     currentDay = this;
 
     // day button panel changes
+    console.log(days);
+    console.log(currentDay);
     currentDay.$button.addClass('current-day');
     $dayTitle.text('Day ' + currentDay.number);
 
@@ -75,8 +103,24 @@ var daysModule = (function(){
   function addDay () {
     if (this && this.blur) this.blur();
     var newDay = new Day();
-    if (days.length === 1) currentDay = newDay;
+    if (days.length != 0) currentDay = newDay;
+    console.log(newDay);
     newDay.switchTo();
+    createDay(newDay.number);
+  }
+
+  function createDay(number) {
+    $.ajax({
+      method: 'POST',
+      url: '/api/days/',
+      data: {number:number},
+      success: function(response){
+        console.log("Response:",response);
+      },
+      error: function(err){
+        console.log(err);
+      }
+    });
   }
 
   function deleteCurrentDay () {
@@ -90,12 +134,51 @@ var daysModule = (function(){
     $removeDay.on('click', deleteCurrentDay);
   })
 
+
+  function getDays(){
+    $.ajax({
+      method: 'GET',
+      url: '/api/days',
+      success: function(days){
+         if(days.length === 0) $(addDay);
+        else{
+          days.forEach(function(day){
+            var newDay = new Day({
+              number: day.number,
+              hotel: day.hotel,
+              restaurants: day.restaurants,
+              activities: day.activities
+            });
+            currentDay = newDay;
+          });
+        }
+      },
+      error: function(err){
+        console.log(err);
+      }
+    });
+  }
+
+
+  function addAttractionToDB(day, attraction){
+    $.ajax({
+      method: 'POST', 
+      url: '/api/days/'+ day.number + "/" + attraction.type,
+      success: function(){
+        console.log('skatedog');
+      },
+      error: function(err){
+        console.log(err);
+      }
+    });
+  }
+
   // globally accessible methods of the daysModule
 
   var methods = {
 
     load: function(){
-      $(addDay);
+      getDays();
     },
 
     addAttraction: function(attractionData){
@@ -106,6 +189,7 @@ var daysModule = (function(){
         case 'activity': currentDay.activities.push(attraction); break;
         default: console.error('bad type:', attraction);
       }
+      addAttractionToDB(currentDay,attraction);
     },
 
     getCurrentDay: function(){

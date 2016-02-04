@@ -10,16 +10,16 @@ router.get('/', function(req, res) {
   Promise.all([
     Hotel.find(),
     Restaurant.find(),
-    Activity.find()
+    Activity.find(),
   ])
   .spread(function(dbHotels, dbRestaurants, dbActivities) {
       res.render('index', {
         templateHotels: dbHotels,
         templateRestaurants: dbRestaurants,
-        templateActivities: dbActivities
+        templateActivities: dbActivities,
       });
-    })
+    });
 
-})
+});
 
 module.exports = router;
