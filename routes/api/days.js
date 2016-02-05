@@ -64,12 +64,34 @@ router.post('/:id/hotel',function(req,res){
 router.delete('/:id/hotel',function(req,res){	});
 
 //Add a restaurant to a day!!!
-router.post('/:id/restaurant',function(req,res){});
+router.post('/:id/restaurant',function(req,res){
+	var ourrestaraunt;
+	Restaurant.find({_id :req.body.id}).exec()
+	.then(function(restaurant){
+		ourrestaraunt = restaurant[0];
+		return Day.findOne({number :req.params.id}).exec();
+	}).then(function(day){
+		console.log('ourrest', ourrestaraunt);
+		day.restaurants.push(ourrestaraunt)
+		day.save();
+	})
+});
 //remove
 router.delete('/:id/restaurant',function(req,res){	});
 
 //Add an activity to a day!!!
-router.post('/:id/activity',function(req,res){});
+router.post('/:id/activity',function(req,res){
+	var ouractivity;
+	Activity.find({_id :req.body.id}).exec()
+	.then(function(activity){
+		ouractivity = activity[0];
+		return Day.findOne({number :req.params.id}).exec();
+	}).then(function(day){
+		console.log('ourrest', ouractivity);
+		day.activities.push(ouractivity);
+		day.save();
+	})
+});
 //remove
 router.delete('/:id/activity',function(req,res){	});
 
