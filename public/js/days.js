@@ -48,11 +48,16 @@ var daysModule = (function(){
         for(var key in day){
           if(response.hasOwnProperty(key)){
             day[key] = response[key];
-            if(key === 'hotel' && day[key]){
-              console.log(key+"is",day[key]);
-              day[key].type = key;
+            if(key === 'hotel' && day[key]){   
+              day[key].type = key;        
               day[key] = attractionsModule.create(day[key]);
-              console.log("This one",day[key]);
+            }
+            if(key==="restaurants" || key === "activities"){
+              day[key]=day[key].map(function(attraction){
+                attraction.type = key = "restaurants" ? "restaurant" : "activity";
+                attraction = attractionsModule.create(attraction);
+                return attraction;
+              });
             }
           }
         }
@@ -92,7 +97,7 @@ var daysModule = (function(){
         console.log('attraction', attraction);
       attraction.drawItineraryItem(); 
     }
-
+    console.log("Curerentnten Day ", currentDay);
     if (currentDay.hotel) draw(currentDay.hotel);
     currentDay.restaurants.forEach(draw);
     currentDay.activities.forEach(draw);

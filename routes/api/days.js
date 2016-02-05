@@ -20,7 +20,9 @@ router.get('/',function(req, res){
 router.get('/:id', function(req,res){
 	var id = req.params.id;
 	Day.findOne({number:id})
-	.populate('hotel').exec()
+	.populate('hotel')
+	.populate('restaurants')
+	.populate('activities').exec()
 	.then(function(day){
 		// day.hotel.prototype = Object.create(req.body.attraction);
 		console.log("Daybruh",day);

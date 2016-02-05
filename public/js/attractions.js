@@ -23,7 +23,6 @@ var attractionsModule = (function(){
   // Attraction class
 
   function Attraction (data) {
-    console.log("data", data, "this", this);
     merge(data, this);
     this.buildItineraryItem().drawItineraryItem();
   }
