@@ -94,10 +94,9 @@ var daysModule = (function(){
 
     // itinerary repopulation
     function draw (attraction) { 
-        console.log('attraction', attraction);
       attraction.drawItineraryItem(); 
     }
-    console.log("Curerentnten Day ", currentDay);
+    
     if (currentDay.hotel) draw(currentDay.hotel);
     currentDay.restaurants.forEach(draw);
     currentDay.activities.forEach(draw);
