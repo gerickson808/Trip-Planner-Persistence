@@ -55,6 +55,7 @@ var mapModule = (function(){
     },
 
     removeMarker: function (marker) {
+      console.log('marker', marker);
       marker.setMap(null);
     }
 
