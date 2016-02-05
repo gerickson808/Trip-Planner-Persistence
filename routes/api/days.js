@@ -19,9 +19,11 @@ router.get('/',function(req, res){
 //Get one day
 router.get('/:id', function(req,res){
 	var id = req.params.id;
-	Day.findOne({number:id}).exec()
+	Day.findOne({number:id})
+	.populate('hotel').exec()
 	.then(function(day){
-		console.log(day);
+		// day.hotel.prototype = Object.create(req.body.attraction);
+		console.log("Daybruh",day);
 		res.json(day);
 	});
 });
@@ -46,29 +48,30 @@ router.delete('/:id',function(req,res){
 });
 
 //Add a hotel to a day!!!
-router.post('/:id/hotels',function(req,res){
+router.post('/:id/hotel',function(req,res){
 	var ourhotel;
-	Hotel.find({name:req.body.name}).exec()
+	Hotel.find({_id :req.body.id}).exec()
 	.then(function(hotel){
-		ourhotel = hotel;
-		return Day.findOne({_id:req.params.id}).exec();
+		ourhotel = hotel[0];
+		return Day.findOne({number :req.params.id}).exec();
 	}).then(function(day){
-		day.hotel = ourhotel._id;
-	});
+		day.hotel = ourhotel;
+		day.save();
+	})
 });
 
 //remove
-router.delete('/:id/hotels',function(req,res){	});
+router.delete('/:id/hotel',function(req,res){	});
 
 //Add a restaurant to a day!!!
-router.post('/:id/restaurants',function(req,res){});
+router.post('/:id/restaurant',function(req,res){});
 //remove
-router.delete('/:id/restaurants',function(req,res){	});
+router.delete('/:id/restaurant',function(req,res){	});
 
 //Add an activity to a day!!!
-router.post('/:id/activities',function(req,res){});
+router.post('/:id/activity',function(req,res){});
 //remove
-router.delete('/:id/activities',function(req,res){	});
+router.delete('/:id/activity',function(req,res){	});
 
 
 

@@ -41,22 +41,23 @@ var daysModule = (function(){
 
 
   function getDay(day){
-      console.log("imma day", day)
     $.ajax({
       method: 'GET',
       url: '/api/days/'+day.number,
-      //data: {hotel:day.hotel, restaurants:day.restaurants, activities:day.activities},
       success: function(response){
         for(var key in day){
           if(response.hasOwnProperty(key)){
             day[key] = response[key];
+            if(key === 'hotel' && day[key]){
+              console.log(key+"is",day[key]);
+              day[key].type = key;
+              day[key] = attractionsModule.create(day[key]);
+              console.log("This one",day[key]);
+            }
           }
         }
-        console.log(currentDay);
-        day.switchTo.call(day)
-        .then(null,function(err){
-          console.log(err);
-        })},
+        day.switchTo.call(day);
+        },
       error: function(err){
         console.log(err);
       }
@@ -80,17 +81,18 @@ var daysModule = (function(){
     currentDay.activities.forEach(erase);
 
     // front-end model change
-    console.log("this", this);
     currentDay = this;
 
     // day button panel changes
-    console.log(days);
-    console.log(currentDay);
     currentDay.$button.addClass('current-day');
     $dayTitle.text('Day ' + currentDay.number);
 
     // itinerary repopulation
-    function draw (attraction) { attraction.drawItineraryItem(); }
+    function draw (attraction) { 
+        console.log('attraction', attraction);
+      attraction.drawItineraryItem(); 
+    }
+
     if (currentDay.hotel) draw(currentDay.hotel);
     currentDay.restaurants.forEach(draw);
     currentDay.activities.forEach(draw);
@@ -163,9 +165,10 @@ var daysModule = (function(){
   function addAttractionToDB(day, attraction){
     $.ajax({
       method: 'POST', 
+      data: {id: attraction._id},
       url: '/api/days/'+ day.number + "/" + attraction.type,
       success: function(){
-        console.log('skatedog');
+        console.log('successfully added attraction');
       },
       error: function(err){
         console.log(err);
@@ -189,7 +192,7 @@ var daysModule = (function(){
         case 'activity': currentDay.activities.push(attraction); break;
         default: console.error('bad type:', attraction);
       }
-      addAttractionToDB(currentDay,attraction);
+      addAttractionToDB(currentDay, attraction);
     },
 
     getCurrentDay: function(){

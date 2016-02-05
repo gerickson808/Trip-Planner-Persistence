@@ -23,6 +23,7 @@ var attractionsModule = (function(){
   // Attraction class
 
   function Attraction (data) {
+    console.log("data", data, "this", this);
     merge(data, this);
     this.buildItineraryItem().drawItineraryItem();
   }
@@ -88,6 +89,12 @@ var attractionsModule = (function(){
 
     create: function (attractionData) {
       return new Attraction(attractionData);
+    },
+
+    createDummy: function(){
+      return new Attraction({
+        happy:"face"
+      })
     }
 
   }
